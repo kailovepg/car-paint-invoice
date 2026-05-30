@@ -24,12 +24,12 @@
     --text: #1e2a3a;
     --text-muted: #64748b;
     --danger: #dc2626;
+    --draft-color: #7c3aed;
+    --draft-bg: #f5f3ff;
     --radius: 10px;
     --shadow: 0 2px 12px rgba(15,43,91,0.10);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'IBM Plex Sans Thai', 'Sarabun', sans-serif;
     background: var(--bg);
@@ -38,554 +38,612 @@
     font-size: 15px;
   }
 
-  /* ===== TOP BAR ===== */
+  /* TOP BAR */
   .topbar {
     background: var(--navy);
-    padding: 14px 24px;
+    padding: 14px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 200;
     box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    gap: 10px;
   }
-  .topbar-title {
-    color: white;
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-  }
+  .topbar-title { color: white; font-size: 16px; font-weight: 600; letter-spacing: 0.01em; white-space: nowrap; }
   .topbar-title span { color: var(--accent); }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
   .btn-print {
-    background: var(--accent);
-    color: #1a1a1a;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 22px;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: transform 0.15s, background 0.15s;
+    background: var(--accent); color: #1a1a1a;
+    border: none; border-radius: 8px; padding: 9px 18px;
+    font-size: 13px; font-weight: 600; font-family: inherit;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: transform 0.15s;
+    white-space: nowrap;
   }
   .btn-print:active { transform: scale(0.96); }
-  .btn-print svg { width: 18px; height: 18px; }
+  .btn-save-draft {
+    background: var(--draft-color); color: white;
+    border: none; border-radius: 8px; padding: 9px 18px;
+    font-size: 13px; font-weight: 600; font-family: inherit;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: transform 0.15s, background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-save-draft:hover { background: #6d28d9; }
+  .btn-save-draft:active { transform: scale(0.96); }
+  .btn-new-form {
+    background: rgba(255,255,255,0.12); color: white;
+    border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 9px 14px;
+    font-size: 13px; font-weight: 600; font-family: inherit;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-new-form:hover { background: rgba(255,255,255,0.2); }
 
-  /* ===== MAIN LAYOUT ===== */
-  .main {
-    max-width: 820px;
+  /* LAYOUT */
+  .page-layout {
+    max-width: 1100px;
     margin: 0 auto;
     padding: 20px 16px 60px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
   }
+  @media (max-width: 860px) {
+    .page-layout { grid-template-columns: 1fr; }
+    .drafts-panel { order: -1; }
+  }
+  .form-col { display: flex; flex-direction: column; gap: 18px; }
 
-  .card {
-    background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
+  /* CARD */
+  .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
   .card-header {
-    background: var(--navy);
-    padding: 12px 20px;
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    background: var(--navy); padding: 12px 20px;
+    color: white; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
   }
-  .card-header svg { opacity: 0.75; }
+  .card-header.draft-header { background: var(--draft-color); }
   .card-body { padding: 20px; }
 
-  /* ===== SHOP SETTINGS ===== */
-  .shop-logo-area {
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-    flex-wrap: wrap;
+  /* DRAFT PANEL */
+  .drafts-panel { position: sticky; top: 76px; }
+  .draft-count-badge {
+    background: rgba(255,255,255,0.25); color: white;
+    font-size: 11px; padding: 2px 8px; border-radius: 20px;
+    margin-left: auto; font-weight: 700;
   }
+  .drafts-list { display: flex; flex-direction: column; gap: 10px; }
+  .draft-item {
+    border: 1.5px solid var(--border); border-radius: 9px;
+    padding: 12px 14px; background: white;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    cursor: default;
+  }
+  .draft-item:hover { border-color: var(--draft-color); box-shadow: 0 0 0 3px rgba(124,58,237,0.08); }
+  .draft-item.active-draft { border-color: var(--draft-color); border-width: 2px; background: var(--draft-bg); }
+  .draft-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+  .draft-plate {
+    font-size: 13px; font-weight: 700; color: var(--navy);
+    background: var(--navy-pale); padding: 2px 9px; border-radius: 6px;
+  }
+  .draft-timestamp { font-size: 10px; color: var(--text-muted); white-space: nowrap; }
+  .draft-cust { font-size: 12px; color: var(--text); font-weight: 600; margin-bottom: 2px; }
+  .draft-car { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .draft-grand {
+    font-size: 13px; font-weight: 700; color: var(--navy-mid);
+    margin-bottom: 8px;
+  }
+  .draft-actions { display: flex; gap: 6px; }
+  .btn-draft-edit {
+    flex: 1; background: var(--draft-color); color: white;
+    border: none; border-radius: 7px; padding: 7px 10px;
+    font-family: inherit; font-size: 12px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+    transition: background 0.15s;
+  }
+  .btn-draft-edit:hover { background: #6d28d9; }
+  .btn-draft-del {
+    background: #fee2e2; color: var(--danger);
+    border: none; border-radius: 7px; padding: 7px 10px;
+    font-family: inherit; font-size: 12px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+    transition: background 0.15s;
+  }
+  .btn-draft-del:hover { background: #fca5a5; }
+
+  .empty-drafts {
+    text-align: center; padding: 28px 16px;
+    color: var(--text-muted); font-size: 13px; line-height: 1.6;
+  }
+  .empty-drafts-icon { font-size: 32px; margin-bottom: 8px; }
+
+  /* CURRENT DRAFT INDICATOR */
+  .current-draft-banner {
+    background: var(--draft-bg); border: 1.5px solid var(--draft-color);
+    border-radius: 9px; padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--draft-color); font-weight: 600;
+  }
+  .current-draft-banner span { color: var(--text-muted); font-weight: 400; font-size: 12px; margin-left: 2px; }
+
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,43,91,0.55); z-index: 500;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white; border-radius: 14px; padding: 28px 26px;
+    max-width: 380px; width: 100%; box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+  }
+  .modal-title { font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .modal-body { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+  .modal-actions { display: flex; flex-direction: column; gap: 8px; }
+  .btn-modal-overwrite {
+    background: var(--draft-color); color: white;
+    border: none; border-radius: 8px; padding: 12px;
+    font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-modal-overwrite:hover { background: #6d28d9; }
+  .btn-modal-new {
+    background: var(--navy-pale); color: var(--navy);
+    border: 1.5px solid var(--border); border-radius: 8px; padding: 12px;
+    font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-modal-new:hover { background: #d5e3f7; }
+  .btn-modal-cancel {
+    background: transparent; color: var(--text-muted);
+    border: none; border-radius: 8px; padding: 10px;
+    font-family: inherit; font-size: 13px; cursor: pointer;
+    text-align: center;
+  }
+
+  /* SHOP SETTINGS */
+  .shop-logo-area { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
   .logo-upload-box {
-    width: 100px;
-    height: 100px;
-    border: 2px dashed var(--border);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    flex-shrink: 0;
-    background: var(--navy-pale);
-    transition: border-color 0.2s;
+    width: 90px; height: 90px;
+    border: 2px dashed var(--border); border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; overflow: hidden;
+    flex-shrink: 0; background: var(--navy-pale); transition: border-color 0.2s;
   }
   .logo-upload-box:hover { border-color: var(--navy-light); }
-  .logo-upload-box input[type=file] {
-    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-  }
-  .logo-upload-box img { width: 100%; height: 100%; object-fit: contain; }
-  .logo-placeholder { display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; }
-  .logo-placeholder svg { width: 32px; height: 32px; color: var(--navy-mid); }
-  .logo-placeholder span { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.3; }
+  .logo-upload-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .logo-placeholder { display: flex; flex-direction: column; align-items: center; gap: 5px; pointer-events: none; }
+  .logo-placeholder svg { width: 28px; height: 28px; color: var(--navy-mid); }
+  .logo-placeholder span { font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.3; }
   .shop-fields { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 10px; }
+  #logoPreviewImg { width: 100%; height: 100%; object-fit: contain; display: none; position: absolute; inset: 0; }
 
-  /* ===== FORM ELEMENTS ===== */
+  /* FORMS */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
   .form-group { display: flex; flex-direction: column; gap: 5px; }
   .form-group.full { grid-column: 1 / -1; }
-  label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
   input[type=text], input[type=tel], textarea, select {
-    font-family: inherit;
-    font-size: 14px;
-    padding: 10px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    background: white;
-    transition: border-color 0.2s;
-    width: 100%;
+    font-family: inherit; font-size: 14px; padding: 10px 12px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    color: var(--text); background: white; transition: border-color 0.2s; width: 100%;
   }
   input[type=text]:focus, input[type=tel]:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: var(--navy-light);
+    outline: none; border-color: var(--navy-light);
     box-shadow: 0 0 0 3px rgba(44,95,168,0.12);
   }
-  textarea { resize: vertical; min-height: 72px; }
+  textarea { resize: vertical; min-height: 64px; }
 
-  /* ===== ITEMS TABLE ===== */
+  /* ITEMS TABLE */
   .items-table-wrap { overflow-x: auto; }
-  table.items-table { width: 100%; border-collapse: collapse; min-width: 520px; }
+  table.items-table { width: 100%; border-collapse: collapse; min-width: 500px; }
   .items-table thead th {
-    background: var(--navy);
-    color: white;
-    padding: 10px 12px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-align: left;
+    background: var(--navy); color: white;
+    padding: 10px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-align: left;
   }
-  .items-table thead th:last-child { text-align: center; width: 48px; }
+  .items-table thead th:last-child { text-align: center; width: 44px; }
   .items-table thead th.th-price { text-align: right; }
   .items-table tbody tr { border-bottom: 1px solid var(--border); }
   .items-table tbody tr:last-child { border-bottom: none; }
-  .items-table td { padding: 8px 10px; vertical-align: middle; }
-  .items-table input[type=text] { padding: 8px 10px; font-size: 14px; }
-  .items-table input.price-input {
-    text-align: right;
-    padding: 8px 10px;
-    font-size: 14px;
-    width: 100%;
-  }
-  .items-table select { padding: 8px 10px; font-size: 13px; }
-
-  .badge-labor {
-    background: var(--labor-bg);
-    color: var(--labor-color);
-    font-size: 11px; font-weight: 700;
-    padding: 3px 8px; border-radius: 20px;
-    white-space: nowrap;
-  }
-  .badge-parts {
-    background: var(--parts-bg);
-    color: var(--parts-color);
-    font-size: 11px; font-weight: 700;
-    padding: 3px 8px; border-radius: 20px;
-    white-space: nowrap;
-  }
-
+  .items-table td { padding: 7px 9px; vertical-align: middle; }
+  .items-table input[type=text] { padding: 7px 9px; font-size: 13px; }
+  .items-table input.price-input { text-align: right; padding: 7px 9px; font-size: 13px; width: 100%; }
+  .items-table select { padding: 7px 9px; font-size: 12px; }
   .btn-del {
     background: #fee2e2; color: var(--danger);
-    border: none; border-radius: 6px;
-    width: 32px; height: 32px;
+    border: none; border-radius: 6px; width: 30px; height: 30px;
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer; margin: auto; flex-shrink: 0;
+    cursor: pointer; margin: auto;
   }
   .btn-del:active { background: #fca5a5; }
-
   .btn-add-row {
     display: flex; align-items: center; gap: 8px;
     background: var(--navy-pale); color: var(--navy);
-    border: 1.5px dashed var(--navy-light);
-    border-radius: 8px; padding: 10px 18px;
-    font-family: inherit; font-size: 14px; font-weight: 600;
+    border: 1.5px dashed var(--navy-light); border-radius: 8px; padding: 9px 18px;
+    font-family: inherit; font-size: 13px; font-weight: 600;
     cursor: pointer; width: 100%; justify-content: center;
-    margin-top: 12px; transition: background 0.15s;
+    margin-top: 10px; transition: background 0.15s;
   }
   .btn-add-row:hover { background: #d5e3f7; }
 
-  /* ===== TOTALS ===== */
-  .totals-grid {
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
-  }
+  /* TOTALS */
+  .totals-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
   @media (max-width: 500px) { .totals-grid { grid-template-columns: 1fr; } }
-  .total-box {
-    border-radius: 10px; padding: 16px 18px;
-    display: flex; flex-direction: column; gap: 4px;
-  }
+  .total-box { border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 3px; }
   .total-box.labor { background: var(--labor-bg); }
   .total-box.parts { background: var(--parts-bg); }
   .total-box.grand { background: var(--navy); }
-  .total-label { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .total-label { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
   .total-box.labor .total-label { color: var(--labor-color); }
   .total-box.parts .total-label { color: var(--parts-color); }
-  .total-box.grand .total-label { color: rgba(255,255,255,0.65); }
-  .total-amount { font-size: 22px; font-weight: 700; }
+  .total-box.grand .total-label { color: rgba(255,255,255,0.6); }
+  .total-amount { font-size: 20px; font-weight: 700; }
   .total-box.labor .total-amount { color: var(--labor-color); }
   .total-box.parts .total-amount { color: var(--parts-color); }
   .total-box.grand .total-amount { color: white; }
 
-  /* ===== DIVIDER ===== */
-  .section-divider { height: 1px; background: var(--border); margin: 4px 0; }
-
-  /* ===== NOTE FIELD ===== */
-  .note-row { display: flex; flex-direction: column; gap: 5px; }
-
-  /* ===== PDF PREVIEW (hidden, used for capture) ===== */
-  #pdf-doc {
-    position: fixed; left: -9999px; top: 0;
-    width: 794px;
-    background: white;
-    font-family: 'IBM Plex Sans Thai', 'Sarabun', sans-serif;
-    color: #1e2a3a;
-    padding: 0;
-  }
-
-  .pdf-page {
-    width: 794px;
-    min-height: 1123px;
-    padding: 40px 48px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* PDF Header */
-  .pdf-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 3px solid #0f2b5b;
-  }
-  .pdf-shop-info { display: flex; gap: 16px; align-items: flex-start; }
-  .pdf-logo { width: 70px; height: 70px; object-fit: contain; flex-shrink: 0; }
-  .pdf-logo-text {
-    width: 70px; height: 70px; background: #0f2b5b;
-    border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 11px; font-weight: 700; text-align: center; padding: 6px;
-  }
-  .pdf-shop-name { font-size: 17px; font-weight: 700; color: #0f2b5b; margin-bottom: 4px; }
-  .pdf-shop-addr { font-size: 11px; color: #475569; line-height: 1.6; }
-  .pdf-doc-meta { text-align: right; }
-  .pdf-doc-title {
-    font-size: 22px; font-weight: 800;
-    color: #0f2b5b; letter-spacing: -0.01em; margin-bottom: 6px;
-  }
-  .pdf-doc-sub { font-size: 11px; color: #64748b; line-height: 1.7; }
-  .pdf-doc-no { font-size: 13px; font-weight: 700; color: #1a3f7f; }
-
-  /* PDF Customer + Car */
-  .pdf-info-row {
-    display: flex; gap: 16px; margin-bottom: 20px;
-  }
-  .pdf-info-box {
-    flex: 1; border: 1.5px solid #d1dae8;
-    border-radius: 8px; overflow: hidden;
-  }
-  .pdf-info-box-title {
-    background: #0f2b5b; color: white;
-    font-size: 11px; font-weight: 700;
-    padding: 7px 14px; letter-spacing: 0.04em;
-  }
-  .pdf-info-grid {
-    padding: 10px 14px;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px;
-  }
-  .pdf-info-item { font-size: 11px; display: flex; gap: 4px; }
-  .pdf-info-key { color: #64748b; min-width: 60px; flex-shrink: 0; }
-  .pdf-info-val { font-weight: 600; color: #1e2a3a; }
-
-  /* PDF Table */
-  .pdf-items-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px; }
-  .pdf-items-table thead tr { background: #0f2b5b; }
-  .pdf-items-table thead th {
-    color: white; padding: 9px 12px;
-    text-align: left; font-weight: 700; font-size: 11px; letter-spacing: 0.03em;
-  }
-  .pdf-items-table thead th.r { text-align: right; }
-  .pdf-items-table thead th.c { text-align: center; }
-  .pdf-items-table tbody td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
-  .pdf-items-table tbody tr:nth-child(even) td { background: #f8fafc; }
-  .pdf-items-table td.r { text-align: right; font-weight: 600; }
-  .pdf-items-table td.c { text-align: center; }
-
-  .pdf-badge-labor { background: #eff6ff; color: #1a56db; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
-  .pdf-badge-parts { background: #ecfdf5; color: #047857; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
-
-  /* PDF Totals */
-  .pdf-totals-section { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-  .pdf-totals-box { width: 280px; }
-  .pdf-total-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 7px 14px; font-size: 12px;
-  }
-  .pdf-total-row.labor { background: #eff6ff; border-radius: 6px; margin-bottom: 4px; color: #1a56db; font-weight: 600; }
-  .pdf-total-row.parts { background: #ecfdf5; border-radius: 6px; margin-bottom: 8px; color: #047857; font-weight: 600; }
-  .pdf-total-row.grand {
-    background: #0f2b5b; border-radius: 8px;
-    color: white; font-size: 15px; font-weight: 800; padding: 12px 16px;
-  }
-
-  /* PDF Warranty */
-  .pdf-warranty {
-    background: #fffbeb; border: 1.5px solid #fde68a;
-    border-radius: 8px; padding: 10px 14px; margin-bottom: 20px;
-    font-size: 11px; color: #78350f; line-height: 1.6;
-  }
-  .pdf-warranty strong { font-weight: 700; display: block; margin-bottom: 3px; color: #92400e; }
-
-  /* PDF Signatures */
-  .pdf-sigs { display: flex; gap: 16px; }
-  .pdf-sig-box {
-    flex: 1; border: 1.5px solid #d1dae8;
-    border-radius: 8px; padding: 14px 16px;
-    text-align: center;
-  }
-  .pdf-sig-line {
-    border-bottom: 1.5px solid #94a3b8;
-    margin: 32px 16px 8px;
-  }
-  .pdf-sig-label { font-size: 11px; color: #475569; }
-  .pdf-sig-date { font-size: 10px; color: #94a3b8; margin-top: 4px; }
-
-  /* PDF Note */
-  .pdf-note { background: #f8fafc; border-left: 3px solid #2c5fa8; border-radius: 0 6px 6px 0; padding: 10px 14px; margin-bottom: 16px; font-size: 11px; color: #475569; }
-  .pdf-note strong { color: #0f2b5b; font-weight: 700; }
-
-  .pdf-footer {
-    margin-top: auto; padding-top: 16px;
-    border-top: 1px solid #e2e8f0;
-    font-size: 10px; color: #94a3b8; text-align: center;
-  }
-
-  /* Save button area */
-  .actions-bar {
-    display: flex; gap: 10px; flex-wrap: wrap;
-  }
+  /* MISC */
   .btn-secondary {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 7px;
     background: var(--navy-pale); color: var(--navy);
-    border: 1.5px solid var(--border);
-    border-radius: 8px; padding: 10px 18px;
-    font-family: inherit; font-size: 14px; font-weight: 600;
+    border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 16px;
+    font-family: inherit; font-size: 13px; font-weight: 600;
     cursor: pointer; transition: background 0.15s;
   }
   .btn-secondary:hover { background: #d5e3f7; }
-  .save-msg { font-size: 13px; color: var(--parts-color); font-weight: 600; align-self: center; }
+  .save-msg { font-size: 12px; color: var(--parts-color); font-weight: 700; align-self: center; }
+
+  /* PDF HIDDEN */
+  #pdf-doc {
+    position: fixed; left: -9999px; top: 0;
+    width: 794px; background: white;
+    font-family: 'IBM Plex Sans Thai', 'Sarabun', sans-serif;
+    color: #1e2a3a; padding: 0;
+  }
+  .pdf-page { width: 794px; min-height: 1123px; padding: 40px 48px; display: flex; flex-direction: column; }
+  .pdf-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 22px; padding-bottom: 18px; border-bottom: 3px solid #0f2b5b;
+  }
+  .pdf-shop-info { display: flex; gap: 14px; align-items: flex-start; }
+  .pdf-logo { width: 68px; height: 68px; object-fit: contain; flex-shrink: 0; }
+  .pdf-logo-text {
+    width: 68px; height: 68px; background: #0f2b5b; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 10px; font-weight: 700; text-align: center; padding: 6px;
+  }
+  .pdf-shop-name { font-size: 16px; font-weight: 700; color: #0f2b5b; margin-bottom: 4px; }
+  .pdf-shop-addr { font-size: 11px; color: #475569; line-height: 1.6; }
+  .pdf-doc-meta { text-align: right; }
+  .pdf-doc-title { font-size: 22px; font-weight: 800; color: #0f2b5b; margin-bottom: 4px; }
+  .pdf-doc-sub { font-size: 11px; color: #64748b; line-height: 1.7; }
+  .pdf-doc-no { font-size: 13px; font-weight: 700; color: #1a3f7f; }
+  .pdf-info-row { display: flex; gap: 14px; margin-bottom: 18px; }
+  .pdf-info-box { flex: 1; border: 1.5px solid #d1dae8; border-radius: 8px; overflow: hidden; }
+  .pdf-info-box-title { background: #0f2b5b; color: white; font-size: 11px; font-weight: 700; padding: 6px 13px; letter-spacing: 0.04em; }
+  .pdf-info-grid { padding: 9px 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 3px 10px; }
+  .pdf-info-item { font-size: 11px; display: flex; gap: 4px; }
+  .pdf-info-key { color: #64748b; min-width: 55px; flex-shrink: 0; }
+  .pdf-info-val { font-weight: 600; color: #1e2a3a; }
+  .pdf-items-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 12px; }
+  .pdf-items-table thead tr { background: #0f2b5b; }
+  .pdf-items-table thead th { color: white; padding: 8px 11px; text-align: left; font-weight: 700; font-size: 11px; letter-spacing: 0.03em; }
+  .pdf-items-table thead th.r { text-align: right; }
+  .pdf-items-table thead th.c { text-align: center; }
+  .pdf-items-table tbody td { padding: 7px 11px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+  .pdf-items-table tbody tr:nth-child(even) td { background: #f8fafc; }
+  .pdf-items-table td.r { text-align: right; font-weight: 600; }
+  .pdf-items-table td.c { text-align: center; }
+  .pdf-badge-labor { background: #eff6ff; color: #1a56db; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .pdf-badge-parts { background: #ecfdf5; color: #047857; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .pdf-totals-section { display: flex; justify-content: flex-end; margin-bottom: 18px; }
+  .pdf-totals-box { width: 270px; }
+  .pdf-total-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 13px; font-size: 12px; }
+  .pdf-total-row.labor { background: #eff6ff; border-radius: 6px; margin-bottom: 4px; color: #1a56db; font-weight: 600; }
+  .pdf-total-row.parts { background: #ecfdf5; border-radius: 6px; margin-bottom: 7px; color: #047857; font-weight: 600; }
+  .pdf-total-row.grand { background: #0f2b5b; border-radius: 8px; color: white; font-size: 14px; font-weight: 800; padding: 11px 14px; }
+  .pdf-warranty { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 8px; padding: 9px 13px; margin-bottom: 18px; font-size: 11px; color: #78350f; line-height: 1.6; }
+  .pdf-warranty strong { font-weight: 700; display: block; margin-bottom: 2px; color: #92400e; }
+  .pdf-sigs { display: flex; gap: 14px; }
+  .pdf-sig-box { flex: 1; border: 1.5px solid #d1dae8; border-radius: 8px; padding: 12px 14px; text-align: center; }
+  .pdf-sig-line { border-bottom: 1.5px solid #94a3b8; margin: 28px 14px 7px; }
+  .pdf-sig-label { font-size: 11px; color: #475569; }
+  .pdf-sig-date { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+  .pdf-note { background: #f8fafc; border-left: 3px solid #2c5fa8; border-radius: 0 6px 6px 0; padding: 9px 13px; margin-bottom: 14px; font-size: 11px; color: #475569; }
+  .pdf-note strong { color: #0f2b5b; font-weight: 700; }
+  .pdf-footer { margin-top: auto; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #94a3b8; text-align: center; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1e2a3a; color: white; padding: 11px 22px;
+    border-radius: 24px; font-size: 13px; font-weight: 600;
+    z-index: 999; transition: transform 0.3s ease; pointer-events: none;
+    white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--parts-color); }
+  .toast.draft { background: var(--draft-color); }
 </style>
 </head>
 <body>
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="topbar-title">🔧 อู่ <span>ทำสีรถยนต์</span> — ใบเสนอราคา</div>
-  <button class="btn-print" onclick="generatePDF()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
-    พิมพ์ / PDF
-  </button>
+  <div class="topbar-title">🔧 อู่ <span>ทำสีรถยนต์</span></div>
+  <div class="topbar-actions">
+    <button class="btn-new-form" onclick="confirmNewForm()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      ใบใหม่
+    </button>
+    <button class="btn-save-draft" onclick="triggerSaveDraft()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      บันทึกแบบร่าง
+    </button>
+    <button class="btn-print" onclick="generatePDF()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+      พิมพ์ / PDF
+    </button>
+  </div>
 </div>
 
-<div class="main">
+<div class="page-layout">
 
-  <!-- SHOP SETTINGS -->
-  <div class="card">
-    <div class="card-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      ตั้งค่าข้อมูลร้าน (Shop Settings)
+  <!-- FORM COLUMN -->
+  <div class="form-col">
+
+    <!-- Current draft banner -->
+    <div class="current-draft-banner" id="currentDraftBanner" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      กำลังแก้ไขแบบร่าง: <strong id="currentDraftLabel"></strong>
+      <span id="currentDraftId" style="display:none"></span>
     </div>
-    <div class="card-body">
-      <div class="shop-logo-area">
-        <div class="logo-upload-box" id="logoBox">
-          <input type="file" accept="image/*" id="logoInput" onchange="handleLogoUpload(event)">
-          <div class="logo-placeholder" id="logoPlaceholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span>แตะเพื่อ<br>อัปโหลดโลโก้</span>
+
+    <!-- SHOP SETTINGS -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        ตั้งค่าข้อมูลร้าน
+      </div>
+      <div class="card-body">
+        <div class="shop-logo-area">
+          <div class="logo-upload-box" id="logoBox">
+            <input type="file" accept="image/*" id="logoInput" onchange="handleLogoUpload(event)">
+            <div class="logo-placeholder" id="logoPlaceholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>แตะเพื่อ<br>อัปโหลดโลโก้</span>
+            </div>
+            <img id="logoPreviewImg" alt="โลโก้ร้าน">
           </div>
-          <img id="logoPreview" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;" alt="โลโก้ร้าน">
+          <div class="shop-fields">
+            <div class="form-group">
+              <label>ชื่อร้าน / อู่</label>
+              <input type="text" id="shopName" placeholder="เช่น อู่ดีเซลสีสวย" oninput="saveShopData()">
+            </div>
+            <div class="form-group">
+              <label>ที่อยู่ร้าน</label>
+              <textarea id="shopAddress" placeholder="บ้านเลขที่, ถนน, แขวง, เขต, จังหวัด" rows="2" oninput="saveShopData()"></textarea>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>เบอร์โทรร้าน</label>
+                <input type="tel" id="shopPhone" placeholder="0xx-xxx-xxxx" oninput="saveShopData()">
+              </div>
+              <div class="form-group">
+                <label>Line ID ร้าน</label>
+                <input type="text" id="shopLine" placeholder="@shopline" oninput="saveShopData()">
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="shop-fields">
-          <div class="form-group">
-            <label>ชื่อร้าน / อู่</label>
-            <input type="text" id="shopName" placeholder="เช่น อู่ดีเซลสีสวย" oninput="saveShopData()">
+        <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <button class="btn-secondary" onclick="clearLogo()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+            ลบโลโก้
+          </button>
+          <span class="save-msg" id="saveMsg" style="display:none">✓ บันทึกข้อมูลร้านแล้ว</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMER -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        ข้อมูลลูกค้า
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>ชื่อลูกค้า</label>
+            <input type="text" id="custName" placeholder="ชื่อ-นามสกุล">
           </div>
           <div class="form-group">
-            <label>ที่อยู่ร้าน</label>
-            <textarea id="shopAddress" placeholder="บ้านเลขที่, ถนน, แขวง, เขต, จังหวัด" rows="2" oninput="saveShopData()"></textarea>
+            <label>เบอร์โทรศัพท์</label>
+            <input type="tel" id="custPhone" placeholder="0xx-xxx-xxxx">
           </div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>เบอร์โทรร้าน</label>
-              <input type="tel" id="shopPhone" placeholder="0xx-xxx-xxxx" oninput="saveShopData()">
-            </div>
-            <div class="form-group">
-              <label>Line ID ร้าน</label>
-              <input type="text" id="shopLine" placeholder="@shopline" oninput="saveShopData()">
-            </div>
+          <div class="form-group">
+            <label>Line ID</label>
+            <input type="text" id="custLine" placeholder="@lineid">
           </div>
         </div>
       </div>
-      <div style="margin-top:12px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-        <button class="btn-secondary" onclick="clearLogo()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-          ลบโลโก้
+    </div>
+
+    <!-- CAR -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        ข้อมูลรถยนต์
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>ยี่ห้อ / รุ่น</label>
+            <input type="text" id="carModel" placeholder="เช่น Toyota Camry 2023">
+          </div>
+          <div class="form-group">
+            <label>ทะเบียนรถ</label>
+            <input type="text" id="carPlate" placeholder="กก 1234 กรุงเทพฯ">
+          </div>
+          <div class="form-group">
+            <label>สีเดิมของรถ</label>
+            <input type="text" id="carColor" placeholder="เช่น ขาวมุก, ดำเมทัลลิก">
+          </div>
+          <div class="form-group">
+            <label>วันที่ออกใบเสนอราคา</label>
+            <input type="text" id="quoteDate" placeholder="วว/ดด/ปปปป">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ITEMS -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        รายการซ่อม / ทำสี
+      </div>
+      <div class="card-body">
+        <div class="items-table-wrap">
+          <table class="items-table" id="itemsTable">
+            <thead>
+              <tr>
+                <th style="width:32px;">#</th>
+                <th>รายการ</th>
+                <th style="width:120px;">ประเภท</th>
+                <th class="th-price" style="width:120px;">ราคา (บาท)</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+          </table>
+        </div>
+        <button class="btn-add-row" onclick="addRow()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          เพิ่มแถวรายการ
         </button>
-        <span class="save-msg" id="saveMsg" style="display:none">✓ บันทึกแล้ว</span>
+      </div>
+    </div>
+
+    <!-- TOTALS -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        สรุปยอดเงิน
+      </div>
+      <div class="card-body">
+        <div class="totals-grid">
+          <div class="total-box labor">
+            <div class="total-label">ยอดรวมค่าแรงทำสี</div>
+            <div class="total-amount" id="totalLabor">฿0.00</div>
+          </div>
+          <div class="total-box parts">
+            <div class="total-label">ยอดรวมค่าอะไหล่</div>
+            <div class="total-amount" id="totalParts">฿0.00</div>
+          </div>
+          <div class="total-box grand">
+            <div class="total-label">ยอดรวมสุทธิ</div>
+            <div class="total-amount" id="totalGrand">฿0.00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTE -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        หมายเหตุเพิ่มเติม
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label>หมายเหตุ / เงื่อนไขพิเศษ</label>
+          <textarea id="quoteNote" placeholder="ระบุหมายเหตุ เช่น ระยะเวลาซ่อม, เงื่อนไขการชำระเงิน..." rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end form-col -->
+
+  <!-- DRAFTS PANEL -->
+  <div class="drafts-panel">
+    <div class="card">
+      <div class="card-header draft-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        ประวัติ / แบบร่าง
+        <span class="draft-count-badge" id="draftCountBadge">0</span>
+      </div>
+      <div class="card-body" style="padding:14px;">
+        <div class="drafts-list" id="draftsList"></div>
       </div>
     </div>
   </div>
 
-  <!-- CUSTOMER INFO -->
-  <div class="card">
-    <div class="card-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      ข้อมูลลูกค้า
-    </div>
-    <div class="card-body">
-      <div class="form-grid">
-        <div class="form-group full">
-          <label>ชื่อลูกค้า</label>
-          <input type="text" id="custName" placeholder="ชื่อ-นามสกุล">
-        </div>
-        <div class="form-group">
-          <label>เบอร์โทรศัพท์</label>
-          <input type="tel" id="custPhone" placeholder="0xx-xxx-xxxx">
-        </div>
-        <div class="form-group">
-          <label>Line ID</label>
-          <input type="text" id="custLine" placeholder="@lineid">
-        </div>
-      </div>
+</div><!-- end page-layout -->
+
+<!-- HIDDEN PDF -->
+<div id="pdf-doc"><div class="pdf-page" id="pdfPage"></div></div>
+
+<!-- SAVE MODAL -->
+<div class="modal-overlay" id="saveModal">
+  <div class="modal-box">
+    <div class="modal-title">💾 บันทึกแบบร่าง</div>
+    <div class="modal-body" id="saveModalBody">กำลังแก้ไขแบบร่างเดิมอยู่ ต้องการทำอะไร?</div>
+    <div class="modal-actions">
+      <button class="btn-modal-overwrite" onclick="doSaveDraft('overwrite')">🔄 บันทึกทับของเดิม</button>
+      <button class="btn-modal-new" onclick="doSaveDraft('new')">📄 สร้างเป็นใบใหม่</button>
+      <button class="btn-modal-cancel" onclick="closeModal('saveModal')">ยกเลิก</button>
     </div>
   </div>
-
-  <!-- CAR INFO -->
-  <div class="card">
-    <div class="card-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
-      ข้อมูลรถยนต์
-    </div>
-    <div class="card-body">
-      <div class="form-grid">
-        <div class="form-group">
-          <label>ยี่ห้อ / รุ่น</label>
-          <input type="text" id="carModel" placeholder="เช่น Toyota Camry 2023">
-        </div>
-        <div class="form-group">
-          <label>ทะเบียนรถ</label>
-          <input type="text" id="carPlate" placeholder="กก 1234 กรุงเทพฯ">
-        </div>
-        <div class="form-group">
-          <label>สีเดิมของรถ</label>
-          <input type="text" id="carColor" placeholder="เช่น ขาวมุก, ดำเมทัลลิก">
-        </div>
-        <div class="form-group">
-          <label>วันที่ออกใบเสนอราคา</label>
-          <input type="text" id="quoteDate" placeholder="วว/ดด/ปปปป">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ITEMS TABLE -->
-  <div class="card">
-    <div class="card-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-      รายการซ่อม / ทำสี
-    </div>
-    <div class="card-body">
-      <div class="items-table-wrap">
-        <table class="items-table" id="itemsTable">
-          <thead>
-            <tr>
-              <th style="width:36px;">#</th>
-              <th>รายการ</th>
-              <th style="width:130px;">ประเภท</th>
-              <th class="th-price" style="width:130px;">ราคา (บาท)</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="itemsBody"></tbody>
-        </table>
-      </div>
-      <button class="btn-add-row" onclick="addRow()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        เพิ่มแถวรายการ
-      </button>
-    </div>
-  </div>
-
-  <!-- TOTALS -->
-  <div class="card">
-    <div class="card-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-      สรุปยอดเงิน
-    </div>
-    <div class="card-body">
-      <div class="totals-grid">
-        <div class="total-box labor">
-          <div class="total-label">ยอดรวมค่าแรงทำสี</div>
-          <div class="total-amount" id="totalLabor">฿0</div>
-        </div>
-        <div class="total-box parts">
-          <div class="total-label">ยอดรวมค่าอะไหล่</div>
-          <div class="total-amount" id="totalParts">฿0</div>
-        </div>
-        <div class="total-box grand">
-          <div class="total-label">ยอดรวมสุทธิ</div>
-          <div class="total-amount" id="totalGrand">฿0</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- NOTE -->
-  <div class="card">
-    <div class="card-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      หมายเหตุเพิ่มเติม
-    </div>
-    <div class="card-body">
-      <div class="note-row">
-        <label>หมายเหตุ / เงื่อนไขพิเศษ</label>
-        <textarea id="quoteNote" placeholder="ระบุหมายเหตุเพิ่มเติม เช่น ระยะเวลาซ่อม, เงื่อนไขการชำระเงิน..." rows="3"></textarea>
-      </div>
-    </div>
-  </div>
-
-</div><!-- end .main -->
-
-<!-- ===== HIDDEN PDF DOCUMENT ===== -->
-<div id="pdf-doc">
-  <div class="pdf-page" id="pdfPage"></div>
 </div>
+
+<!-- CONFIRM NEW FORM MODAL -->
+<div class="modal-overlay" id="newFormModal">
+  <div class="modal-box">
+    <div class="modal-title">📋 เริ่มใบใหม่</div>
+    <div class="modal-body">ข้อมูลในฟอร์มปัจจุบันจะถูกล้าง ต้องการบันทึกเป็นแบบร่างก่อนหรือไม่?</div>
+    <div class="modal-actions">
+      <button class="btn-modal-overwrite" onclick="saveBeforeNew()">💾 บันทึกแบบร่างก่อน แล้วเริ่มใหม่</button>
+      <button class="btn-modal-new" onclick="clearFormFull(); closeModal('newFormModal')">🗑️ ล้างฟอร์มโดยไม่บันทึก</button>
+      <button class="btn-modal-cancel" onclick="closeModal('newFormModal')">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
-/* ===== GLOBALS ===== */
+/* ========== GLOBALS ========== */
 let logoDataURL = null;
 let rowCount = 0;
+let currentDraftId = null;
 
-/* ===== DATE DEFAULT ===== */
+/* ========== UTILS ========== */
+function getVal(id) { return (document.getElementById(id)||{}).value || ''; }
+function setVal(id, v) { const el = document.getElementById(id); if(el) el.value = v || ''; }
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type;
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* ========== DATE ========== */
 (function(){
   const d = new Date();
   const dd = String(d.getDate()).padStart(2,'0');
@@ -594,143 +652,301 @@ let rowCount = 0;
   document.getElementById('quoteDate').value = `${dd}/${mm}/${yyyy}`;
 })();
 
-/* ===== SHOP DATA PERSISTENCE ===== */
+function thaiDate() {
+  const d = new Date();
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()+543}`;
+}
+
+function now_ts() {
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yy = String(d.getFullYear()).slice(2);
+  const hh = String(d.getHours()).padStart(2,'0');
+  const mi = String(d.getMinutes()).padStart(2,'0');
+  return `${dd}/${mm}/${yy} ${hh}:${mi}`;
+}
+
+/* ========== SHOP DATA ========== */
 function saveShopData() {
   const data = {
-    shopName: document.getElementById('shopName').value,
-    shopAddress: document.getElementById('shopAddress').value,
-    shopPhone: document.getElementById('shopPhone').value,
-    shopLine: document.getElementById('shopLine').value,
+    shopName: getVal('shopName'), shopAddress: getVal('shopAddress'),
+    shopPhone: getVal('shopPhone'), shopLine: getVal('shopLine'),
     logoDataURL: logoDataURL
   };
   try { localStorage.setItem('shopSettings', JSON.stringify(data)); } catch(e) {}
   const msg = document.getElementById('saveMsg');
   msg.style.display = 'inline';
   clearTimeout(msg._t);
-  msg._t = setTimeout(() => msg.style.display = 'none', 2000);
+  msg._t = setTimeout(() => msg.style.display = 'none', 1800);
 }
 
 function loadShopData() {
   try {
     const raw = localStorage.getItem('shopSettings');
     if (!raw) return;
-    const data = JSON.parse(raw);
-    document.getElementById('shopName').value = data.shopName || '';
-    document.getElementById('shopAddress').value = data.shopAddress || '';
-    document.getElementById('shopPhone').value = data.shopPhone || '';
-    document.getElementById('shopLine').value = data.shopLine || '';
-    if (data.logoDataURL) {
-      logoDataURL = data.logoDataURL;
-      showLogoPreview(logoDataURL);
-    }
+    const d = JSON.parse(raw);
+    setVal('shopName', d.shopName); setVal('shopAddress', d.shopAddress);
+    setVal('shopPhone', d.shopPhone); setVal('shopLine', d.shopLine);
+    if (d.logoDataURL) { logoDataURL = d.logoDataURL; showLogoPreview(logoDataURL); }
   } catch(e) {}
 }
 
 function handleLogoUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    logoDataURL = ev.target.result;
-    showLogoPreview(logoDataURL);
-    saveShopData();
-  };
-  reader.readAsDataURL(file);
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => { logoDataURL = ev.target.result; showLogoPreview(logoDataURL); saveShopData(); };
+  r.readAsDataURL(file);
 }
 
 function showLogoPreview(src) {
-  const img = document.getElementById('logoPreview');
+  const img = document.getElementById('logoPreviewImg');
   const ph = document.getElementById('logoPlaceholder');
-  img.src = src;
-  img.style.display = 'block';
-  ph.style.display = 'none';
+  img.src = src; img.style.display = 'block'; ph.style.display = 'none';
 }
 
 function clearLogo() {
   logoDataURL = null;
-  const img = document.getElementById('logoPreview');
-  const ph = document.getElementById('logoPlaceholder');
-  img.style.display = 'none';
-  img.src = '';
-  ph.style.display = 'flex';
+  document.getElementById('logoPreviewImg').style.display = 'none';
+  document.getElementById('logoPreviewImg').src = '';
+  document.getElementById('logoPlaceholder').style.display = 'flex';
   document.getElementById('logoInput').value = '';
   saveShopData();
 }
 
-/* ===== ROWS ===== */
+/* ========== ROWS ========== */
 function addRow(desc='', type='labor', price='') {
   rowCount++;
   const tbody = document.getElementById('itemsBody');
   const tr = document.createElement('tr');
   tr.id = `row-${rowCount}`;
+  const escDesc = desc.replace(/"/g,'&quot;');
   tr.innerHTML = `
-    <td style="color:var(--text-muted);font-size:13px;text-align:center;">${tbody.children.length + 1}</td>
-    <td><input type="text" value="${desc}" placeholder="รายละเอียดงาน..." style="width:100%;border:1.5px solid var(--border);border-radius:7px;" oninput=""></td>
-    <td>
-      <select onchange="updateTotals(); updateTypeBadge(this)" style="width:100%;border:1.5px solid var(--border);border-radius:7px;">
-        <option value="labor" ${type==='labor'?'selected':''}>ค่าแรงทำสี</option>
-        <option value="parts" ${type==='parts'?'selected':''}>ค่าอะไหล่</option>
-      </select>
-    </td>
+    <td style="color:var(--text-muted);font-size:12px;text-align:center;">${tbody.children.length+1}</td>
+    <td><input type="text" value="${escDesc}" placeholder="รายละเอียดงาน..." style="width:100%;border:1.5px solid var(--border);border-radius:7px;"></td>
+    <td><select onchange="updateTotals()" style="width:100%;border:1.5px solid var(--border);border-radius:7px;">
+      <option value="labor" ${type==='labor'?'selected':''}>ค่าแรงทำสี</option>
+      <option value="parts" ${type==='parts'?'selected':''}>ค่าอะไหล่</option>
+    </select></td>
     <td><input type="text" class="price-input" value="${price}" placeholder="0.00" style="width:100%;border:1.5px solid var(--border);border-radius:7px;text-align:right;" oninput="updateTotals()" onkeypress="return /[0-9.]/.test(event.key)"></td>
-    <td style="text-align:center;">
-      <button class="btn-del" onclick="removeRow('row-${rowCount}')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </td>`;
+    <td style="text-align:center;"><button class="btn-del" onclick="removeRow('row-${rowCount}')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button></td>`;
   tbody.appendChild(tr);
-  updateTotals();
-  renumberRows();
+  updateTotals(); renumberRows();
 }
 
 function removeRow(id) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
-  updateTotals();
-  renumberRows();
+  const el = document.getElementById(id); if (el) el.remove();
+  updateTotals(); renumberRows();
 }
 
 function renumberRows() {
   const rows = document.getElementById('itemsBody').children;
-  for (let i = 0; i < rows.length; i++) {
-    rows[i].cells[0].textContent = i + 1;
-  }
+  for (let i = 0; i < rows.length; i++) rows[i].cells[0].textContent = i + 1;
 }
-
-function updateTypeBadge(sel) { /* visual feedback could go here */ }
 
 function updateTotals() {
   const rows = document.getElementById('itemsBody').children;
   let labor = 0, parts = 0;
   for (const row of rows) {
     const sel = row.querySelector('select');
-    const priceInput = row.querySelector('.price-input');
-    const val = parseFloat(priceInput.value.replace(/,/g,'')) || 0;
-    if (sel.value === 'labor') labor += val;
-    else parts += val;
+    const val = parseFloat(row.querySelector('.price-input').value.replace(/,/g,'')) || 0;
+    if (sel.value === 'labor') labor += val; else parts += val;
   }
   const grand = labor + parts;
-  document.getElementById('totalLabor').textContent = '฿' + labor.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2});
-  document.getElementById('totalParts').textContent = '฿' + parts.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2});
-  document.getElementById('totalGrand').textContent = '฿' + grand.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const fmt = v => '฿' + v.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('totalLabor').textContent = fmt(labor);
+  document.getElementById('totalParts').textContent = fmt(parts);
+  document.getElementById('totalGrand').textContent = fmt(grand);
+  return { labor, parts, grand };
 }
 
-function getVal(id) { return (document.getElementById(id)||{}).value || ''; }
-
-/* ===== COLLECT DATA ===== */
 function collectItems() {
   const rows = document.getElementById('itemsBody').children;
   const items = [];
   for (const row of rows) {
-    const desc = row.querySelectorAll('input')[0].value || '';
-    const type = row.querySelector('select').value;
-    const price = parseFloat(row.querySelector('.price-input').value.replace(/,/g,'')) || 0;
-    items.push({ desc, type, price });
+    items.push({
+      desc: row.querySelectorAll('input')[0].value || '',
+      type: row.querySelector('select').value,
+      price: parseFloat(row.querySelector('.price-input').value.replace(/,/g,'')) || 0
+    });
   }
   return items;
 }
 
-/* ===== BUILD PDF HTML ===== */
+/* ========== DRAFT SYSTEM ========== */
+function getDrafts() {
+  try { return JSON.parse(localStorage.getItem('quoteDrafts') || '[]'); } catch(e) { return []; }
+}
+function saveDrafts(arr) {
+  try { localStorage.setItem('quoteDrafts', JSON.stringify(arr)); } catch(e) {}
+}
+
+function collectFormData() {
+  return {
+    custName: getVal('custName'), custPhone: getVal('custPhone'), custLine: getVal('custLine'),
+    carModel: getVal('carModel'), carPlate: getVal('carPlate'), carColor: getVal('carColor'),
+    quoteDate: getVal('quoteDate'), quoteNote: getVal('quoteNote'),
+    items: collectItems()
+  };
+}
+
+function triggerSaveDraft() {
+  if (currentDraftId) {
+    const drafts = getDrafts();
+    const existing = drafts.find(d => d.id === currentDraftId);
+    const label = existing ? (existing.custName || existing.carPlate || 'แบบร่าง') : 'แบบร่าง';
+    document.getElementById('saveModalBody').innerHTML =
+      `กำลังแก้ไขแบบร่างของ <strong>${label}</strong> ต้องการทำอะไร?`;
+    openModal('saveModal');
+  } else {
+    doSaveDraft('new');
+  }
+}
+
+function doSaveDraft(mode) {
+  closeModal('saveModal');
+  const data = collectFormData();
+  const drafts = getDrafts();
+
+  if (mode === 'overwrite' && currentDraftId) {
+    const idx = drafts.findIndex(d => d.id === currentDraftId);
+    if (idx > -1) {
+      drafts[idx] = { ...drafts[idx], ...data, updatedAt: Date.now(), ts: now_ts() };
+      saveDrafts(drafts);
+      renderDrafts();
+      showToast('✓ บันทึกทับแบบร่างเดิมแล้ว', 'draft');
+      updateDraftBanner(drafts[idx]);
+      return;
+    }
+  }
+
+  // new draft
+  const newDraft = {
+    id: 'draft_' + Date.now(),
+    createdAt: Date.now(), updatedAt: Date.now(), ts: now_ts(),
+    ...data
+  };
+  drafts.unshift(newDraft);
+  saveDrafts(drafts);
+  currentDraftId = newDraft.id;
+  renderDrafts();
+  updateDraftBanner(newDraft);
+  showToast('✓ บันทึกแบบร่างใหม่แล้ว', 'draft');
+}
+
+function loadDraft(id) {
+  const drafts = getDrafts();
+  const d = drafts.find(x => x.id === id);
+  if (!d) return;
+  currentDraftId = id;
+  setVal('custName', d.custName); setVal('custPhone', d.custPhone); setVal('custLine', d.custLine);
+  setVal('carModel', d.carModel); setVal('carPlate', d.carPlate); setVal('carColor', d.carColor);
+  setVal('quoteDate', d.quoteDate); setVal('quoteNote', d.quoteNote);
+  // clear and reload rows
+  document.getElementById('itemsBody').innerHTML = '';
+  rowCount = 0;
+  if (d.items && d.items.length) {
+    d.items.forEach(item => addRow(item.desc, item.type, item.price || ''));
+  } else {
+    addRow(); addRow('', 'parts');
+  }
+  updateTotals();
+  updateDraftBanner(d);
+  renderDrafts();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('📂 เปิดแบบร่าง: ' + (d.custName || d.carPlate || 'แบบร่าง'), 'draft');
+}
+
+function deleteDraft(id) {
+  if (!confirm('ต้องการลบแบบร่างนี้ใช่ไหม?')) return;
+  let drafts = getDrafts().filter(d => d.id !== id);
+  saveDrafts(drafts);
+  if (currentDraftId === id) { currentDraftId = null; hideDraftBanner(); }
+  renderDrafts();
+  showToast('🗑️ ลบแบบร่างแล้ว');
+}
+
+function updateDraftBanner(d) {
+  const banner = document.getElementById('currentDraftBanner');
+  const label = document.getElementById('currentDraftLabel');
+  banner.style.display = 'flex';
+  label.textContent = (d.custName || d.carPlate || 'ไม่มีชื่อ') + ' · ' + d.ts;
+}
+function hideDraftBanner() {
+  document.getElementById('currentDraftBanner').style.display = 'none';
+}
+
+function renderDrafts() {
+  const drafts = getDrafts();
+  const list = document.getElementById('draftsList');
+  const badge = document.getElementById('draftCountBadge');
+  badge.textContent = drafts.length;
+
+  if (drafts.length === 0) {
+    list.innerHTML = `<div class="empty-drafts">
+      <div class="empty-drafts-icon">📂</div>
+      ยังไม่มีแบบร่างที่บันทึกไว้<br>กด <strong>"บันทึกแบบร่าง"</strong> เพื่อเริ่มต้น
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  drafts.forEach(d => {
+    const isActive = d.id === currentDraftId;
+    let labor = 0, parts = 0;
+    (d.items || []).forEach(i => { if(i.type==='labor') labor+=i.price; else parts+=i.price; });
+    const grand = labor + parts;
+    const fmt = v => v.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+    const div = document.createElement('div');
+    div.className = 'draft-item' + (isActive ? ' active-draft' : '');
+    div.innerHTML = `
+      <div class="draft-item-top">
+        <span class="draft-plate">${d.carPlate || '—'}</span>
+        <span class="draft-timestamp">${d.ts || ''}</span>
+      </div>
+      <div class="draft-cust">${d.custName || '(ไม่มีชื่อลูกค้า)'}</div>
+      <div class="draft-car">${d.carModel || ''} ${d.carColor ? '· '+d.carColor : ''}</div>
+      <div class="draft-grand">฿${fmt(grand)} ${grand>0?'<span style="font-size:10px;font-weight:400;color:var(--text-muted);">('+d.items.length+' รายการ)</span>':''}</div>
+      <div class="draft-actions">
+        <button class="btn-draft-edit" onclick="loadDraft('${d.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          เปิดแก้ไข
+        </button>
+        <button class="btn-draft-del" onclick="deleteDraft('${d.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+          ลบ
+        </button>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+/* ========== NEW FORM ========== */
+function confirmNewForm() { openModal('newFormModal'); }
+
+function saveBeforeNew() {
+  closeModal('newFormModal');
+  doSaveDraft(currentDraftId ? 'overwrite' : 'new');
+  setTimeout(() => { clearFormFull(); }, 300);
+}
+
+function clearFormFull() {
+  currentDraftId = null;
+  hideDraftBanner();
+  ['custName','custPhone','custLine','carModel','carPlate','carColor','quoteNote'].forEach(id => setVal(id,''));
+  document.getElementById('quoteDate').value = thaiDate();
+  document.getElementById('itemsBody').innerHTML = '';
+  rowCount = 0;
+  addRow(); addRow('','parts');
+  updateTotals();
+  renderDrafts();
+  showToast('📋 เริ่มใบใหม่แล้ว');
+}
+
+/* ========== PDF BUILD ========== */
 function buildPDFHTML() {
   const shopName = getVal('shopName') || 'อู่ทำสีรถยนต์';
   const shopAddr = getVal('shopAddress');
@@ -747,64 +963,45 @@ function buildPDFHTML() {
   const items = collectItems();
 
   let labor = 0, parts = 0;
-  items.forEach(i => { if (i.type === 'labor') labor += i.price; else parts += i.price; });
+  items.forEach(i => { if(i.type==='labor') labor+=i.price; else parts+=i.price; });
   const grand = labor + parts;
+  const fmt = v => v.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  const fmt = v => v.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const logoHTML = logoDataURL
+    ? `<img class="pdf-logo" src="${logoDataURL}" alt="logo">`
+    : `<div class="pdf-logo-text">${shopName.substring(0,8)}</div>`;
 
-  // Logo HTML
-  let logoHTML = '';
-  if (logoDataURL) {
-    logoHTML = `<img class="pdf-logo" src="${logoDataURL}" alt="logo">`;
-  } else {
-    logoHTML = `<div class="pdf-logo-text">${shopName.substring(0,8)}</div>`;
-  }
-
-  // Items rows
   let itemRows = '';
   items.forEach((item, idx) => {
-    const badgeClass = item.type === 'labor' ? 'pdf-badge-labor' : 'pdf-badge-parts';
-    const badgeText = item.type === 'labor' ? 'ค่าแรงทำสี' : 'ค่าอะไหล่';
-    itemRows += `<tr>
-      <td class="c" style="font-size:11px;color:#64748b;">${idx+1}</td>
-      <td>${item.desc || '-'}</td>
-      <td class="c"><span class="${badgeClass}">${badgeText}</span></td>
-      <td class="r">฿${fmt(item.price)}</td>
-    </tr>`;
+    const bc = item.type==='labor' ? 'pdf-badge-labor' : 'pdf-badge-parts';
+    const bt = item.type==='labor' ? 'ค่าแรงทำสี' : 'ค่าอะไหล่';
+    itemRows += `<tr><td class="c" style="font-size:11px;color:#64748b;">${idx+1}</td>
+      <td>${item.desc||'-'}</td>
+      <td class="c"><span class="${bc}">${bt}</span></td>
+      <td class="r">฿${fmt(item.price)}</td></tr>`;
   });
-  if (items.length === 0) {
-    itemRows = `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:20px;font-size:12px;">ไม่มีรายการ</td></tr>`;
-  }
+  if (!items.length) itemRows = `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:20px;font-size:12px;">ไม่มีรายการ</td></tr>`;
 
-  const shopMeta = [
-    shopAddr ? shopAddr : null,
-    shopPhone ? `โทร: ${shopPhone}` : null,
-    shopLineId ? `Line: ${shopLineId}` : null
-  ].filter(Boolean).join('<br>');
-
+  const shopMeta = [shopAddr, shopPhone?`โทร: ${shopPhone}`:null, shopLineId?`Line: ${shopLineId}`:null].filter(Boolean).join('<br>');
   const noteBlock = note ? `<div class="pdf-note"><strong>📝 หมายเหตุ:</strong> ${note}</div>` : '';
 
-  const html = `
+  return `
     <div class="pdf-header">
-      <div class="pdf-shop-info">
-        ${logoHTML}
-        <div>
-          <div class="pdf-shop-name">${shopName}</div>
-          <div class="pdf-shop-addr">${shopMeta || '&nbsp;'}</div>
-        </div>
-      </div>
+      <div class="pdf-shop-info">${logoHTML}<div>
+        <div class="pdf-shop-name">${shopName}</div>
+        <div class="pdf-shop-addr">${shopMeta||'&nbsp;'}</div>
+      </div></div>
       <div class="pdf-doc-meta">
         <div class="pdf-doc-title">ใบเสนอราคา</div>
         <div class="pdf-doc-no">Quotation</div>
         <div class="pdf-doc-sub">วันที่: ${quoteDate}</div>
       </div>
     </div>
-
     <div class="pdf-info-row">
       <div class="pdf-info-box">
         <div class="pdf-info-box-title">👤 ข้อมูลลูกค้า</div>
         <div class="pdf-info-grid">
-          <div class="pdf-info-item"><span class="pdf-info-key">ชื่อ:</span><span class="pdf-info-val">${custName}</span></div>
+          <div class="pdf-info-item" style="grid-column:1/-1"><span class="pdf-info-key">ชื่อ:</span><span class="pdf-info-val">${custName}</span></div>
           <div class="pdf-info-item"><span class="pdf-info-key">โทร:</span><span class="pdf-info-val">${custPhone}</span></div>
           <div class="pdf-info-item"><span class="pdf-info-key">Line:</span><span class="pdf-info-val">${custLine}</span></div>
         </div>
@@ -818,121 +1015,72 @@ function buildPDFHTML() {
         </div>
       </div>
     </div>
-
     <table class="pdf-items-table">
-      <thead>
-        <tr>
-          <th class="c" style="width:36px;">#</th>
-          <th>รายการ / รายละเอียดงาน</th>
-          <th class="c" style="width:110px;">ประเภท</th>
-          <th class="r" style="width:110px;">ราคา (บาท)</th>
-        </tr>
-      </thead>
+      <thead><tr>
+        <th class="c" style="width:32px;">#</th>
+        <th>รายการ / รายละเอียดงาน</th>
+        <th class="c" style="width:100px;">ประเภท</th>
+        <th class="r" style="width:110px;">ราคา (บาท)</th>
+      </tr></thead>
       <tbody>${itemRows}</tbody>
     </table>
-
-    <div class="pdf-totals-section">
-      <div class="pdf-totals-box">
-        <div class="pdf-total-row labor">
-          <span>💙 รวมค่าแรงทำสี</span><span>฿${fmt(labor)}</span>
-        </div>
-        <div class="pdf-total-row parts">
-          <span>💚 รวมค่าอะไหล่</span><span>฿${fmt(parts)}</span>
-        </div>
-        <div class="pdf-total-row grand">
-          <span>ยอดรวมสุทธิ</span><span>฿${fmt(grand)}</span>
-        </div>
-      </div>
-    </div>
-
+    <div class="pdf-totals-section"><div class="pdf-totals-box">
+      <div class="pdf-total-row labor"><span>💙 รวมค่าแรงทำสี</span><span>฿${fmt(labor)}</span></div>
+      <div class="pdf-total-row parts"><span>💚 รวมค่าอะไหล่</span><span>฿${fmt(parts)}</span></div>
+      <div class="pdf-total-row grand"><span>ยอดรวมสุทธิ</span><span>฿${fmt(grand)}</span></div>
+    </div></div>
     ${noteBlock}
-
     <div class="pdf-warranty">
       <strong>🛡️ เงื่อนไขการรับประกันงานสี</strong>
       บริษัทรับประกันคุณภาพงานสีเป็นระยะเวลา <strong>1 ปี</strong> นับจากวันที่รับมอบรถ ครอบคลุมงานสีหลุด แตกลาย หรือซีดจางที่เกิดจากกระบวนการทำสี ไม่รวมถึงความเสียหายที่เกิดจากอุบัติเหตุ การใช้สารเคมี หรือการดัดแปลงหลังรับรถ
     </div>
-
     <div class="pdf-sigs">
-      <div class="pdf-sig-box">
-        <div class="pdf-sig-line"></div>
-        <div class="pdf-sig-label">ลายมือชื่อผู้เสนอราคา</div>
-        <div class="pdf-sig-date">( ${shopName} )</div>
-      </div>
-      <div class="pdf-sig-box">
-        <div class="pdf-sig-line"></div>
-        <div class="pdf-sig-label">ลายมือชื่อลูกค้า</div>
-        <div class="pdf-sig-date">( ${custName} )</div>
-      </div>
-      <div class="pdf-sig-box">
-        <div class="pdf-sig-line"></div>
-        <div class="pdf-sig-label">วันที่รับทราบ</div>
-        <div class="pdf-sig-date">_____ / _____ / _____</div>
-      </div>
+      <div class="pdf-sig-box"><div class="pdf-sig-line"></div><div class="pdf-sig-label">ลายมือชื่อผู้เสนอราคา</div><div class="pdf-sig-date">( ${shopName} )</div></div>
+      <div class="pdf-sig-box"><div class="pdf-sig-line"></div><div class="pdf-sig-label">ลายมือชื่อลูกค้า</div><div class="pdf-sig-date">( ${custName} )</div></div>
+      <div class="pdf-sig-box"><div class="pdf-sig-line"></div><div class="pdf-sig-label">วันที่รับทราบ</div><div class="pdf-sig-date">_____ / _____ / _____</div></div>
     </div>
-
-    <div class="pdf-footer">
-      เอกสารนี้ออกโดย ${shopName} ${shopPhone ? '| โทร ' + shopPhone : ''} ${shopLineId ? '| Line: ' + shopLineId : ''}
-    </div>
-  `;
-  return html;
+    <div class="pdf-footer">เอกสารนี้ออกโดย ${shopName} ${shopPhone?'| โทร '+shopPhone:''} ${shopLineId?'| Line: '+shopLineId:''}</div>`;
 }
 
-/* ===== GENERATE PDF ===== */
 async function generatePDF() {
   const btn = document.querySelector('.btn-print');
   const orig = btn.innerHTML;
-  btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> กำลังสร้าง PDF...`;
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> กำลังสร้าง...`;
   btn.disabled = true;
 
-  const page = document.getElementById('pdfPage');
-  page.innerHTML = buildPDFHTML();
-
+  document.getElementById('pdfPage').innerHTML = buildPDFHTML();
   await new Promise(r => setTimeout(r, 400));
 
   try {
     const canvas = await html2canvas(document.getElementById('pdf-doc'), {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      width: 794,
-      windowWidth: 794
+      scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', width: 794, windowWidth: 794
     });
-
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pdfW = pdf.internal.pageSize.getWidth();
     const pdfH = (canvas.height * pdfW) / canvas.width;
     pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
-
-    const custName = getVal('custName') || 'ลูกค้า';
-    const carPlate = getVal('carPlate') || 'รถยนต์';
-    pdf.save(`ใบเสนอราคา_${custName}_${carPlate}.pdf`);
+    pdf.save(`ใบเสนอราคา_${getVal('custName')||'ลูกค้า'}_${getVal('carPlate')||'รถ'}.pdf`);
   } catch(err) {
-    // fallback: print
     const w = window.open('', '_blank');
-    w.document.write(`<!DOCTYPE html><html><head>
-      <meta charset="UTF-8">
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
       <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-      <style>
-        body { font-family:'IBM Plex Sans Thai',sans-serif; background:white; margin:0; padding:0; }
-        ${document.querySelector('style').innerHTML}
-      </style></head><body>
+      <style>body{font-family:'IBM Plex Sans Thai',sans-serif;background:white;margin:0;}
+      ${document.querySelector('style').innerHTML}</style></head><body>
       <div style="width:794px;padding:40px 48px;">${buildPDFHTML()}</div>
-      <script>window.onload=function(){window.print();window.close();}<\/script>
-      </body></html>`);
+      <script>window.onload=function(){window.print();window.close();}<\/script></body></html>`);
     w.document.close();
   }
 
-  btn.innerHTML = orig;
-  btn.disabled = false;
+  btn.innerHTML = orig; btn.disabled = false;
 }
 
-/* ===== INIT ===== */
+/* ========== INIT ========== */
 loadShopData();
 addRow('', 'labor', '');
 addRow('', 'parts', '');
+renderDrafts();
 </script>
 </body>
 </html>
